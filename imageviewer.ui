@@ -23,7 +23,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QWidget" name="" native="true">
+     <widget class="QWidget" name="widget" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <layout class="QGridLayout" name="gridLayout_7">
@@ -97,6 +97,7 @@
     </property>
     <addaction name="actionOpen_Image"/>
     <addaction name="actionOpen_Directory"/>
+    <addaction name="actionCrop"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -114,6 +115,11 @@
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionCrop">
+   <property name="text">
+    <string>Crop</string>
    </property>
   </action>
  </widget>
