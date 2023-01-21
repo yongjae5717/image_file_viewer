@@ -1,7 +1,6 @@
 import os
 from PyQt5.QtWidgets import *
 from PyQt5 import uic, QtGui
-from PyQt5.QtWidgets import QListWidget, QListWidgetItem
 
 
 class MyGUI(QMainWindow):
@@ -10,7 +9,7 @@ class MyGUI(QMainWindow):
         super(MyGUI, self).__init__()
         uic.loadUi("imageviewer.ui", self)
         self.show()
-        self.current_file = "demo.jpg"
+        self.current_file = "default.png"
         pixmap = QtGui.QPixmap(self.current_file)
         pixmap = pixmap.scaled(self.width(), self.height())
         self.label.setPixmap(pixmap)
@@ -20,7 +19,7 @@ class MyGUI(QMainWindow):
         try:
             pixmap = QtGui.QPixmap(self.current_file)
         except:
-            pixmap = QtGui.QPixmap("demo.jpg")
+            pixmap = QtGui.QPixmap("default.png")
         pixmap = pixmap.scaled(self.width(), self.height())
         self.label.setPixmap(pixmap)
         self.label.resize(self.width(), self.height())
@@ -30,7 +29,6 @@ class MyGUI(QMainWindow):
         self.actionOpen_Image.triggered.connect(self.open_image)
         # 폴더별 이미지 조회
         self.actionOpen_Directory.triggered.connect(self.open_directory)
-        # self.actionOpen_Directory.clicked.connect(self.file_list)
         # "<" 버튼
         self.pushButton_2.clicked.connect(self.previous_image)
         # ">" 버튼
@@ -65,7 +63,6 @@ class MyGUI(QMainWindow):
             pixmap = pixmap.scaled(self.width(), self.height())
             self.label.setPixmap(pixmap)
             self.label_2.setText(self.current_file)
-            print(self.current_file)
 
     def previous_image(self):
         if self.file_counter is not None:
@@ -76,7 +73,6 @@ class MyGUI(QMainWindow):
             pixmap = pixmap.scaled(self.width(), self.height())
             self.label.setPixmap(pixmap)
             self.label_2.setText(self.current_file)
-            print(self.current_file)
 
     def show_list(self):
         self.listWidget.clear()
@@ -85,6 +81,7 @@ class MyGUI(QMainWindow):
             for item in self.file_list:
                 self.listWidget.insertItem(self.count, item)
                 self.count += 1
+        self.label_2.setText(self.current_file)
 
 
 def main():
