@@ -37,6 +37,8 @@ class MyGUI(QMainWindow):
         self.pushButton_3.clicked.connect(self.show_list)
 
     def open_image(self):
+        self.listWidget.clear()
+        self.file_list = list()
         options = QFileDialog.Options()
         filename, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Image Files (*.png, *.jpg)", options=options)
         if filename != "":
@@ -55,7 +57,7 @@ class MyGUI(QMainWindow):
         self.label.setPixmap(pixmap)
 
     def next_image(self):
-        if self.file_counter is not None:
+        if self.file_counter is not None and self.file_list:
             self.file_counter += 1
             self.file_counter %= len(self.file_list)
             self.current_file = self.file_list[self.file_counter]
@@ -65,7 +67,7 @@ class MyGUI(QMainWindow):
             self.label_2.setText(self.current_file)
 
     def previous_image(self):
-        if self.file_counter is not None:
+        if self.file_counter is not None and self.file_list:
             self.file_counter -= 1
             self.file_counter %= len(self.file_list)
             self.current_file = self.file_list[self.file_counter]

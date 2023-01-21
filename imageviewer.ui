@@ -46,7 +46,7 @@
          </item>
         </layout>
        </item>
-       <item alignment="Qt::AlignLeft|Qt::AlignBottom">
+       <item alignment="Qt::AlignLeft">
         <widget class="QPushButton" name="pushButton_2">
          <property name="font">
           <font>
@@ -58,14 +58,14 @@
          </property>
         </widget>
        </item>
-       <item alignment="Qt::AlignBottom">
+       <item>
         <widget class="QPushButton" name="pushButton_3">
          <property name="text">
           <string>View File List</string>
          </property>
         </widget>
        </item>
-       <item alignment="Qt::AlignRight|Qt::AlignBottom">
+       <item alignment="Qt::AlignRight">
         <widget class="QPushButton" name="pushButton">
          <property name="font">
           <font>
