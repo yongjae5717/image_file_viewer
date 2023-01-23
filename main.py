@@ -2,6 +2,7 @@ import os
 import cv2
 from PyQt5.QtWidgets import *
 from PyQt5 import uic, QtGui
+from PyQt5.QtCore import Qt
 
 
 class MyGUI(QMainWindow):
@@ -42,12 +43,19 @@ class MyGUI(QMainWindow):
         self.pushButton_3.clicked.connect(self.show_list)
         # widget list에서 더블클릭시 파일 보여주기 기능
         self.listWidget.itemDoubleClicked.connect(self.click_image)
-        # cropping시 파일 선택(jpg, png)
-        self.pushButton_5.clicked.connect(self.open_image_crop)
         # row, column 입력 기능
         self.pushButton_4.clicked.connect(self.row_col_pressed)
+        # cropping시 파일 선택(jpg, png)
+        self.pushButton_5.clicked.connect(self.open_image_crop)
         # Cropping 작업 기능
         self.pushButton_6.clicked.connect(self.return_pressed)
+
+    # Key 입력: "F3" -> 이전 이미지, "F4" -> 이후 이미지
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_F3:
+            self.previous_image()
+        elif e.key() == Qt.Key_F4:
+            self.next_image()
 
     def click_image(self):
         filename = str(self.file_list[self.listWidget.currentRow()])
@@ -76,9 +84,9 @@ class MyGUI(QMainWindow):
         filename, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Image Files (*.png, *.jpg)", options=options)
         # print(filename)
         if filename != "":
-            self.current_file2 = filename
-            pixmap_2 = QtGui.QPixmap(self.current_file2)
-            # pixmap = pixmap.scaled(self.width(), self.height())
+            self.current_file_2 = filename
+            pixmap_2 = QtGui.QPixmap(self.current_file_2)
+            pixmap_2 = pixmap_2.scaled(self.width(), self.height())
             self.label_3.setPixmap(pixmap_2)
 
     def open_directory(self):
@@ -127,7 +135,8 @@ class MyGUI(QMainWindow):
     def return_pressed(self):
         row = int(self.row)
         col = int(self.col)
-        img_path = self.current_file2
+        img_path = self.current_file_2
+
         # print(row, col, img_path)
 
         dest_dir = os.path.join('./', f"{col}_{row}_{col * row}cuts")
@@ -150,6 +159,8 @@ class MyGUI(QMainWindow):
 
             roi = img[y1:y2, x1:x2]
             cv2.imwrite(os.path.join(dest_dir, f"{n}_cv.jpg"), roi)
+        pixmap_2 = QtGui.QPixmap(self.current_file_2)
+        self.label.setPixmap(pixmap_2)
 
 
 def main():
