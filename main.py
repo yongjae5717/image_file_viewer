@@ -1,5 +1,4 @@
 import os
-
 import cv2
 from PyQt5.QtWidgets import *
 from PyQt5 import uic, QtGui
@@ -43,8 +42,11 @@ class MyGUI(QMainWindow):
         self.pushButton_3.clicked.connect(self.show_list)
         # widget list에서 더블클릭시 파일 보여주기 기능
         self.listWidget.itemDoubleClicked.connect(self.click_image)
+        # cropping시 파일 선택(jpg, png)
         self.pushButton_5.clicked.connect(self.open_image_crop)
+        # row, column 입력 기능
         self.pushButton_4.clicked.connect(self.row_col_pressed)
+        # Cropping 작업 기능
         self.pushButton_6.clicked.connect(self.return_pressed)
 
     def click_image(self):
@@ -66,7 +68,6 @@ class MyGUI(QMainWindow):
             pixmap = QtGui.QPixmap(self.current_file)
             # pixmap = pixmap.scaled(self.width(), self.height())
             self.label.setPixmap(pixmap)
-
 
     def open_image_crop(self):
         self.listWidget.clear()
@@ -127,7 +128,7 @@ class MyGUI(QMainWindow):
         row = int(self.row)
         col = int(self.col)
         img_path = self.current_file2
-        print(row, col, img_path)
+        # print(row, col, img_path)
 
         dest_dir = os.path.join('./', f"{col}_{row}_{col * row}cuts")
         if not os.path.exists(dest_dir):
@@ -138,14 +139,14 @@ class MyGUI(QMainWindow):
 
         s_w = int(w / col)
         s_h = int(h / row)
-        print(f"crop image size = {s_w}x{s_h}")
+        # print(f"crop image size = {s_w}x{s_h}")
 
         for n in range(1, (col * row) + 1):
             x1 = int(((n - 1) % col) * s_w)
             y1 = int(((n - 1) // col) * s_h)
             x2 = x1 + s_w
             y2 = y1 + s_h
-            print(f"{n} roi : ({x1}, {y1}), ({x2}, {y2})")
+            # print(f"{n} roi : ({x1}, {y1}), ({x2}, {y2})")
 
             roi = img[y1:y2, x1:x2]
             cv2.imwrite(os.path.join(dest_dir, f"{n}_cv.jpg"), roi)
