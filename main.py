@@ -54,6 +54,7 @@ class MyGUI(QMainWindow):
             pixmap = QtGui.QPixmap(self.current_file)
             # pixmap = pixmap.scaled(self.width(), self.height())
             self.label.setPixmap(pixmap)
+            self.label_2.setText(self.current_file)
 
     def open_image(self):
         self.listWidget.clear()
@@ -65,6 +66,7 @@ class MyGUI(QMainWindow):
             pixmap = QtGui.QPixmap(self.current_file)
             # pixmap = pixmap.scaled(self.width(), self.height())
             self.label.setPixmap(pixmap)
+
 
     def open_image_crop(self):
         self.listWidget.clear()
