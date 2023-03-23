@@ -8,6 +8,7 @@ from PyQt5.QtCore import Qt
 class MyGUI(QMainWindow):
 
     def __init__(self):
+        self.flag = False
         super(MyGUI, self).__init__()
         uic.loadUi("imageviewer.ui", self)
         self.show()
@@ -15,7 +16,6 @@ class MyGUI(QMainWindow):
         self.current_file_2 = "default.png"
         pixmap = QtGui.QPixmap(self.current_file)
         pixmap_2 = QtGui.QPixmap(self.current_file_2)
-        # pixmap = pixmap.scaled(self.width(), self.height())
         self.label.setPixmap(pixmap)
         self.label.setMinimumSize(1, 1)
         self.label_3.setPixmap(pixmap_2)
@@ -62,7 +62,6 @@ class MyGUI(QMainWindow):
         if filename != "":
             self.current_file = filename
             pixmap = QtGui.QPixmap(self.current_file)
-            # pixmap = pixmap.scaled(self.width(), self.height())
             self.label.setPixmap(pixmap)
             self.label_2.setText(self.current_file)
 
@@ -74,28 +73,29 @@ class MyGUI(QMainWindow):
         if filename != "":
             self.current_file = filename
             pixmap = QtGui.QPixmap(self.current_file)
-            # pixmap = pixmap.scaled(self.width(), self.height())
             self.label.setPixmap(pixmap)
+        return
 
     def open_image_crop(self):
         self.listWidget.clear()
         self.file_list = list()
         options = QFileDialog.Options()
         filename, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Image Files (*.png, *.jpg)", options=options)
-        # print(filename)
         if filename != "":
             self.current_file_2 = filename
             pixmap_2 = QtGui.QPixmap(self.current_file_2)
             pixmap_2 = pixmap_2.scaled(self.width(), self.height())
             self.label_3.setPixmap(pixmap_2)
+        return
 
     def open_directory(self):
         directory = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        if directory == "":
+            return
         self.file_list = [directory + "/" + str(f) + "_cv.jpg" for f in range(1, len(os.listdir(directory)) + 1)]
         self.file_counter = 0
         self.current_file = self.file_list[self.file_counter]
         pixmap = QtGui.QPixmap(self.current_file)
-        # pixmap = pixmap.scaled(self.width(), self.height())
         self.label.setPixmap(pixmap)
 
     def next_image(self):
@@ -104,7 +104,6 @@ class MyGUI(QMainWindow):
             self.file_counter %= len(self.file_list)
             self.current_file = self.file_list[self.file_counter]
             pixmap = QtGui.QPixmap(self.current_file)
-            # pixmap = pixmap.scaled(self.width(), self.height())
             self.label.setPixmap(pixmap)
             self.label_2.setText(self.current_file)
 
@@ -114,7 +113,6 @@ class MyGUI(QMainWindow):
             self.file_counter %= len(self.file_list)
             self.current_file = self.file_list[self.file_counter]
             pixmap = QtGui.QPixmap(self.current_file)
-            # pixmap = pixmap.scaled(self.width(), self.height())
             self.label.setPixmap(pixmap)
             self.label_2.setText(self.current_file)
 
@@ -131,15 +129,26 @@ class MyGUI(QMainWindow):
         self.row = self.lineEdit.text()
         self.col = self.lineEdit_2.text()
         self.label_4.setText(f"Row: {self.row}, Col: {self.col}")
+        self.flag = True
 
     def return_pressed(self):
+        if not self.flag:
+            self.label_4.setText("입력 버튼을 눌러주세요.")
+            return
+        if not self.row.isdigit() or not self.col.isdigit():
+            self.label_4.setText("Row와 Column은 숫자여야합니다.")
+            return
+
         row = int(self.row)
         col = int(self.col)
+        if row == 1 and col == 1:
+            self.label_4.setText("Row:1, Col:1은 불가능합니다.")
+            return
         img_path = self.current_file_2
 
-        # print(row, col, img_path)
+        p_path = self.parent_path(self.current_file_2)
 
-        dest_dir = os.path.join('./', f"{col}_{row}_{col * row}cuts")
+        dest_dir = os.path.join(p_path, f"{col}_{row}_{col * row}cuts")
         if not os.path.exists(dest_dir):
             os.makedirs(dest_dir)
 
@@ -148,19 +157,23 @@ class MyGUI(QMainWindow):
 
         s_w = int(w / col)
         s_h = int(h / row)
-        # print(f"crop image size = {s_w}x{s_h}")
-
         for n in range(1, (col * row) + 1):
             x1 = int(((n - 1) % col) * s_w)
             y1 = int(((n - 1) // col) * s_h)
             x2 = x1 + s_w
             y2 = y1 + s_h
-            # print(f"{n} roi : ({x1}, {y1}), ({x2}, {y2})")
 
             roi = img[y1:y2, x1:x2]
             cv2.imwrite(os.path.join(dest_dir, f"{n}_cv.jpg"), roi)
         pixmap_2 = QtGui.QPixmap(self.current_file_2)
         self.label.setPixmap(pixmap_2)
+        self.label_4.setText("파일이 생성되었습니다.")
+
+    def parent_path(self, f_path):
+        if not f_path:
+            return
+        tmp = list(f_path.split('/'))
+        return "/".join(tmp[:len(tmp)-1]) + "/"
 
 
 def main():
