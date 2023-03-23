@@ -19,10 +19,12 @@ class MyGUI(QMainWindow):
         pixmap = QtGui.QPixmap(self.current_file)
         pixmap = pixmap.scaled(self.width(), self.height(), aspectRatioMode=Qt.KeepAspectRatio)
         pixmap_2 = QtGui.QPixmap(self.current_file_2)
+        pixmap_2 = pixmap_2.scaled(self.width(), self.height(), aspectRatioMode=Qt.KeepAspectRatio)
         self.label.setPixmap(pixmap)
         self.label.setMinimumSize(1, 1)
         self.label_3.setPixmap(pixmap_2)
         self.label_3.setMinimumSize(1, 1)
+        self.dir_path = ""
 
     def resizeEvent(self, event):
         try:
@@ -52,6 +54,10 @@ class MyGUI(QMainWindow):
         self.pushButton_5.clicked.connect(self.open_image_crop)
         # Cropping 작업 기능
         self.pushButton_6.clicked.connect(self.return_pressed)
+        # Concat 폴더 선택 버튼
+        self.pushButton_7.clicked.connect(self.open_directory_2)
+        # Concat 파일 생성 버튼
+        self.pushButton_8.clicked.connect(self.sum_img)
 
     # Key 입력: "F3" -> 이전 이미지, "F4" -> 이후 이미지
     def keyPressEvent(self, e):
@@ -65,6 +71,7 @@ class MyGUI(QMainWindow):
         if filename != "":
             self.current_file = filename
             pixmap = QtGui.QPixmap(self.current_file)
+            pixmap = pixmap.scaled(self.width(), self.height(), aspectRatioMode=Qt.KeepAspectRatio)
             self.label.setPixmap(pixmap)
             self.label_2.setText(self.current_file)
 
@@ -102,7 +109,22 @@ class MyGUI(QMainWindow):
         self.file_counter = 0
         self.current_file = self.file_list[self.file_counter]
         pixmap = QtGui.QPixmap(self.current_file)
+        pixmap = pixmap.scaled(self.scale_w, self.scale_h, aspectRatioMode=Qt.KeepAspectRatio)
         self.label.setPixmap(pixmap)
+        self.listWidget.clear()
+        self.count = 0
+        if self.file_list is not None:
+            for item in self.file_list:
+                self.listWidget.insertItem(self.count, item)
+                self.count += 1
+        self.label_2.setText(self.current_file)
+
+    def open_directory_2(self):
+        directory = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        if directory == "":
+            return
+        self.dir_path = directory
+        self.label_6.setText(self.dir_path)
 
     def next_image(self):
         if self.file_counter is not None and self.file_list:
@@ -110,6 +132,7 @@ class MyGUI(QMainWindow):
             self.file_counter %= len(self.file_list)
             self.current_file = self.file_list[self.file_counter]
             pixmap = QtGui.QPixmap(self.current_file)
+            pixmap = pixmap.scaled(self.scale_w, self.scale_h, aspectRatioMode=Qt.KeepAspectRatio)
             self.label.setPixmap(pixmap)
             self.label_2.setText(self.current_file)
 
@@ -119,6 +142,7 @@ class MyGUI(QMainWindow):
             self.file_counter %= len(self.file_list)
             self.current_file = self.file_list[self.file_counter]
             pixmap = QtGui.QPixmap(self.current_file)
+            pixmap = pixmap.scaled(self.scale_w, self.scale_h, aspectRatioMode=Qt.KeepAspectRatio)
             self.label.setPixmap(pixmap)
             self.label_2.setText(self.current_file)
 
@@ -181,6 +205,52 @@ class MyGUI(QMainWindow):
         tmp = list(f_path.split('/'))
         return "/".join(tmp[:len(tmp)-1]) + "/"
 
+    def sum_img(self):
+        root_dir = self.dir_path
+        mode_type = ["Normal", "GlossRatio"]
+        subdir = ["1CAM", "2CAM", "3CAM"]
+
+        gloss = list()
+        normal = list()
+        for i in range(len(subdir)):
+            target_dir = os.path.join(root_dir, subdir[i])
+            for n in os.listdir(target_dir):
+                mode = n.split('.')[0].split('_')[-1]
+                if mode == mode_type[0]:
+                    normal.append(os.path.join(target_dir, n))
+                else:
+                    gloss.append(os.path.join(target_dir, n))
+
+        normal.sort()
+        gloss.sort()
+
+        # concat normal images
+        h_img = list()
+        for i in range(3):
+            v_img = list()
+            for j in range(9):
+                idx = i*9 + j
+                v_img.append(cv2.imread(normal[idx]))
+            img = cv2.vconcat(v_img)
+            h_img.append(img)
+
+        normal_img = cv2.hconcat([h_img[2], h_img[1], h_img[0]])
+        # plt.imshow(normal_img)
+        cv2.imwrite(os.path.join(root_dir, "normal.jpg"), normal_img)
+
+        h_img = list()
+        for i in range(3):
+            v_img = list()
+            for j in range(9):
+                idx = i*9 + j
+                v_img.append(cv2.imread(gloss[idx]))
+            img = cv2.vconcat(v_img)
+            h_img.append(img)
+
+        gloss_img = cv2.hconcat([h_img[2], h_img[1], h_img[0]])
+        # plt.imshow(gloss)
+        cv2.imwrite(os.path.join(root_dir, "gloss.jpg"), gloss_img)
+        self.label_5.setText("파일이 생성되었습니다.")
 
 def main():
     app = QApplication([])
