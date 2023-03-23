@@ -9,12 +9,15 @@ class MyGUI(QMainWindow):
 
     def __init__(self):
         self.flag = False
+        self.scale_w = 1500
+        self.scale_h = 850
         super(MyGUI, self).__init__()
         uic.loadUi("imageviewer.ui", self)
         self.show()
         self.current_file = "default.png"
         self.current_file_2 = "default.png"
         pixmap = QtGui.QPixmap(self.current_file)
+        pixmap = pixmap.scaled(self.width(), self.height(), aspectRatioMode=Qt.KeepAspectRatio)
         pixmap_2 = QtGui.QPixmap(self.current_file_2)
         self.label.setPixmap(pixmap)
         self.label.setMinimumSize(1, 1)
@@ -26,7 +29,7 @@ class MyGUI(QMainWindow):
             pixmap = QtGui.QPixmap(self.current_file)
         except:
             pixmap = QtGui.QPixmap("default.png")
-        pixmap = pixmap.scaled(self.width(), self.height())
+        pixmap = pixmap.scaled(self.scale_w, self.scale_h, aspectRatioMode=Qt.KeepAspectRatio)
         self.label.setPixmap(pixmap)
         self.label.resize(self.width(), self.height())
         self.file_list = None
@@ -73,6 +76,9 @@ class MyGUI(QMainWindow):
         if filename != "":
             self.current_file = filename
             pixmap = QtGui.QPixmap(self.current_file)
+            img = cv2.imread(filename)
+            h, w, _ = img.shape
+            pixmap = pixmap.scaled(self.scale_w, self.scale_h, aspectRatioMode=Qt.KeepAspectRatio)
             self.label.setPixmap(pixmap)
         return
 
@@ -84,7 +90,7 @@ class MyGUI(QMainWindow):
         if filename != "":
             self.current_file_2 = filename
             pixmap_2 = QtGui.QPixmap(self.current_file_2)
-            pixmap_2 = pixmap_2.scaled(self.width(), self.height())
+            pixmap_2 = pixmap_2.scaled(self.scale_w, self.scale_h, aspectRatioMode=Qt.KeepAspectRatio)
             self.label_3.setPixmap(pixmap_2)
         return
 
@@ -162,9 +168,9 @@ class MyGUI(QMainWindow):
             y1 = int(((n - 1) // col) * s_h)
             x2 = x1 + s_w
             y2 = y1 + s_h
-
             roi = img[y1:y2, x1:x2]
-            cv2.imwrite(os.path.join(dest_dir, f"{n}_cv.jpg"), roi)
+            tmp = dest_dir + "/" + f"{n}_cv.jpg"
+            cv2.imwrite(tmp, roi)
         pixmap_2 = QtGui.QPixmap(self.current_file_2)
         self.label.setPixmap(pixmap_2)
         self.label_4.setText("파일이 생성되었습니다.")
