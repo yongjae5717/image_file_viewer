@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5 import uic, QtGui
 from PyQt5.QtCore import Qt
 import shutil
-
+import datetime
 
 class MyGUI(QMainWindow):
 
@@ -40,41 +40,89 @@ class MyGUI(QMainWindow):
         # Generate
         self.pushButton_3.clicked.connect(self.automation)
 
-    def copy_backdata(self, backdata_dir, result_dir, model_name):
-        # check file validation
+    def backdata_check(self, backdata_dir, result_dir, model_name):
         li1 = os.listdir(os.path.join(backdata_dir, "1CAM"))
         li2 = os.listdir(os.path.join(backdata_dir, "2CAM"))
         li3 = os.listdir(os.path.join(backdata_dir, "3CAM"))
 
         if len(li1) == len(li2) == len(li3) == 12:
-            # model_name_folder create
-            model_name_folder_path = os.path.join(result_dir, model_name)
-            if os.path.exists(model_name_folder_path):
-                shutil.rmtree(model_name_folder_path, ignore_errors=True)
-                os.mkdir(model_name_folder_path)
-                self.label_3.setText(f"{model_name} 폴더가 생성되었습니다.")
-            else:
-                os.mkdir(model_name_folder_path)
-                self.label_3.setText(f"{model_name} 폴더가 생성되었습니다.")
-
-            # copy backdata
-            if os.path.exists(os.path.join(model_name_folder_path, "1CAM")):
-                shutil.rmtree(os.path.join(model_name_folder_path, "1CAM"), ignore_errors=True)
-            if os.path.exists(os.path.join(model_name_folder_path, "2CAM")):
-                shutil.rmtree(os.path.join(model_name_folder_path, "2CAM"), ignore_errors=True)
-            if os.path.exists(os.path.join(model_name_folder_path, "3CAM")):
-                shutil.rmtree(os.path.join(model_name_folder_path, "3CAM"), ignore_errors=True)
-
-            shutil.copytree(os.path.join(backdata_dir, "1CAM"), os.path.join(model_name_folder_path, "1CAM"))
-            shutil.copytree(os.path.join(backdata_dir, "2CAM"), os.path.join(model_name_folder_path, "2CAM"))
-            shutil.copytree(os.path.join(backdata_dir, "3CAM"), os.path.join(model_name_folder_path, "3CAM"))
-            self.label_4.setText("Backdata 복제가 완료되었습니다.")
-            return 0
-
+            return
         else:
             QMessageBox.warning(self, "Error", f"Backdata를 다시 확인해주세요. (각 카메라 폴더당 12개)\n"
                                                f"현재 Backdata 수 -> 1CAM: {len(li1)}, 2CAM: {len(li2)}, 3CAM: {len(li3)}")
             return
+
+
+    def copy_backdata(self, backdata_dir, result_dir, model_name):
+        # check file validation
+        # li1 = os.listdir(os.path.join(backdata_dir, "1CAM"))
+        # li2 = os.listdir(os.path.join(backdata_dir, "2CAM"))
+        # li3 = os.listdir(os.path.join(backdata_dir, "3CAM"))
+        #
+        # if len(li1) == len(li2) == len(li3) == 12:
+        #     # model_name_folder create
+        #     model_name_folder_path = os.path.join(result_dir, model_name)
+        #     if os.path.exists(model_name_folder_path):
+        #         shutil.rmtree(model_name_folder_path, ignore_errors=True)
+        #         os.mkdir(model_name_folder_path)
+        #         self.label_3.setText(f"{model_name} 폴더가 생성되었습니다.")
+        #     else:
+        #         os.mkdir(model_name_folder_path)
+        #         self.label_3.setText(f"{model_name} 폴더가 생성되었습니다.")
+        #
+        #     # copy backdata
+        #     if os.path.exists(os.path.join(model_name_folder_path, "1CAM")):
+        #         shutil.rmtree(os.path.join(model_name_folder_path, "1CAM"), ignore_errors=True)
+        #     if os.path.exists(os.path.join(model_name_folder_path, "2CAM")):
+        #         shutil.rmtree(os.path.join(model_name_folder_path, "2CAM"), ignore_errors=True)
+        #     if os.path.exists(os.path.join(model_name_folder_path, "3CAM")):
+        #         shutil.rmtree(os.path.join(model_name_folder_path, "3CAM"), ignore_errors=True)
+        #
+        #     shutil.copytree(os.path.join(backdata_dir, "1CAM"), os.path.join(model_name_folder_path, "1CAM"))
+        #     shutil.copytree(os.path.join(backdata_dir, "2CAM"), os.path.join(model_name_folder_path, "2CAM"))
+        #     shutil.copytree(os.path.join(backdata_dir, "3CAM"), os.path.join(model_name_folder_path, "3CAM"))
+        #     self.label_4.setText("Backdata 복제가 완료되었습니다.")
+        #     return 0
+        #
+        # else:
+        #     QMessageBox.warning(self, "Error", f"Backdata를 다시 확인해주세요. (각 카메라 폴더당 12개)\n"
+        #                                        f"현재 Backdata 수 -> 1CAM: {len(li1)}, 2CAM: {len(li2)}, 3CAM: {len(li3)}")
+        #     return
+
+        # modified
+        model_name_folder_path = os.path.join(result_dir, model_name)
+        if os.path.exists(model_name_folder_path):
+            shutil.rmtree(model_name_folder_path, ignore_errors=True)
+            os.mkdir(model_name_folder_path)
+            self.label_3.setText(f"{model_name} 폴더가 생성되었습니다.")
+        else:
+            os.mkdir(model_name_folder_path)
+            self.label_3.setText(f"{model_name} 폴더가 생성되었습니다.")
+
+        # copy backdata
+        if os.path.exists(os.path.join(model_name_folder_path, "1CAM")):
+            shutil.rmtree(os.path.join(model_name_folder_path, "1CAM"), ignore_errors=True)
+        if os.path.exists(os.path.join(model_name_folder_path, "2CAM")):
+            shutil.rmtree(os.path.join(model_name_folder_path, "2CAM"), ignore_errors=True)
+        if os.path.exists(os.path.join(model_name_folder_path, "3CAM")):
+            shutil.rmtree(os.path.join(model_name_folder_path, "3CAM"), ignore_errors=True)
+        shutil.copytree(os.path.join(backdata_dir, "1CAM"), os.path.join(model_name_folder_path, "1CAM"))
+        shutil.copytree(os.path.join(backdata_dir, "2CAM"), os.path.join(model_name_folder_path, "2CAM"))
+        shutil.copytree(os.path.join(backdata_dir, "3CAM"), os.path.join(model_name_folder_path, "3CAM"))
+
+        if os.path.exists(os.path.join(model_name_folder_path, f"{model_name}_normal_default_48cuts")):
+            shutil.rmtree(os.path.join(model_name_folder_path, f"{model_name}_normal_default_48cuts"), ignore_errors=True)
+        if os.path.exists(os.path.join(model_name_folder_path, f"{model_name}_gloss_default_48cuts")):
+            shutil.rmtree(os.path.join(model_name_folder_path, f"{model_name}_gloss_default_48cuts"), ignore_errors=True)
+        shutil.copytree(os.path.join(backdata_dir,  f"{model_name}_normal_default_48cuts"), os.path.join(model_name_folder_path, f"{model_name}_normal_default_48cuts"))
+        shutil.copytree(os.path.join(backdata_dir,  f"{model_name}_gloss_default_48cuts"), os.path.join(model_name_folder_path, f"{model_name}_gloss_default_48cuts"))
+
+        shutil.copy2(os.path.join(backdata_dir,  f"{model_name}_normal.jpg"), os.path.join(model_name_folder_path, f"{model_name}_normal.jpg"))
+        shutil.copy2(os.path.join(backdata_dir, f"{model_name}_gloss.jpg"),
+                     os.path.join(model_name_folder_path, f"{model_name}_gloss.jpg"))
+        self.label_4.setText("Backdata 복제가 완료되었습니다.")
+        return 0
+
 
     def sum_img(self, root_dir, model_name):
         mode_type = ["Normal", "GlossRatio"]
@@ -144,9 +192,11 @@ class MyGUI(QMainWindow):
         self.label_6.setText("이미지 자르기가 완료되었습니다.")
 
     def erase_backdata(self, backdata_dir):
-        shutil.rmtree(os.path.join(backdata_dir, "1CAM"), ignore_errors=True)
-        shutil.rmtree(os.path.join(backdata_dir, "2CAM"), ignore_errors=True)
-        shutil.rmtree(os.path.join(backdata_dir, "3CAM"), ignore_errors=True)
+        # if os.path.exists(backdata_dir):
+        #     for file in os.scandir(backdata_dir):
+        #         os.remove(file.path)
+        shutil.rmtree(backdata_dir)
+        os.mkdir(backdata_dir)
 
         os.mkdir(os.path.join(backdata_dir, "1CAM"))
         os.mkdir(os.path.join(backdata_dir, "2CAM"))
@@ -169,20 +219,39 @@ class MyGUI(QMainWindow):
             QMessageBox.warning(self, "Error", "Backdata를 선택해주세요")
             return
 
-
+        self.backdata_check(self.back_data_path, self.root_dir_path, model_name)
         # copy backdata to result_dir
-        copy_check = self.copy_backdata(self.back_data_path, self.root_dir_path, model_name)
+        # copy_check = self.copy_backdata(self.back_data_path, self.root_dir_path, model_name)
+        #
+        # model_name_folder_path = os.path.join(self.root_dir_path, model_name)
+        # if copy_check == 0:
+        #     self.erase_backdata(self.back_data_path)
+        #
+        #     self.sum_img(model_name_folder_path, model_name)
+        #
+        #     normal_img = os.path.join(model_name_folder_path, f"{model_name}_normal.jpg")
+        #     gloss_img = os.path.join(model_name_folder_path, f"{model_name}_gloss.jpg")
+        #     self.default_segmentation(model_name_folder_path, normal_img, model_name, "normal")
+        #     self.default_segmentation(model_name_folder_path, gloss_img, model_name, "gloss")
 
-        model_name_folder_path = os.path.join(self.root_dir_path, model_name)
+        # mkdir with yymmdd format
+        now = datetime.datetime.now()
+        date = now.strftime('%Y%m%d')
+        date = date[2:]
+
+        today_dir = os.path.join(self.root_dir_path, date)
+        if not os.path.exists(today_dir):
+            os.mkdir(today_dir)
+
+        self.sum_img(self.back_data_path, model_name)
+        normal_img = os.path.join(self.back_data_path, f"{model_name}_normal.jpg")
+        gloss_img = os.path.join(self.back_data_path, f"{model_name}_gloss.jpg")
+        self.default_segmentation(self.back_data_path, normal_img, model_name, "normal")
+        self.default_segmentation(self.back_data_path, gloss_img, model_name, "gloss")
+
+        copy_check = self.copy_backdata(self.back_data_path, today_dir, model_name)
         if copy_check == 0:
             self.erase_backdata(self.back_data_path)
-
-            self.sum_img(model_name_folder_path, model_name)
-
-            normal_img = os.path.join(model_name_folder_path, f"{model_name}_normal.jpg")
-            gloss_img = os.path.join(model_name_folder_path, f"{model_name}_gloss.jpg")
-            self.default_segmentation(model_name_folder_path, normal_img, model_name, "normal")
-            self.default_segmentation(model_name_folder_path, gloss_img, model_name, "gloss")
 
     def open_image_crop(self):
         options = QFileDialog.Options()
